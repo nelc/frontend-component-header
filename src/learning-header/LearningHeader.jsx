@@ -12,6 +12,7 @@ import CourseInfoSlot from '../plugin-slots/CourseInfoSlot';
 import { courseInfoDataShape } from './LearningHeaderCourseInfo';
 import messages from './messages';
 import LearningHelpSlot from '../plugin-slots/LearningHelpSlot';
+import LanguageSelector from '../language-selector';
 
 const LearningHeader = ({
   courseOrg, courseNumber, courseTitle, intl, showUserDropdown,
@@ -35,6 +36,7 @@ const LearningHeader = ({
           <CourseInfoSlot courseOrg={courseOrg} courseNumber={courseNumber} courseTitle={courseTitle} />
         </div>
         {getConfig().LISAN_AI_ENABLED && (<LisanAI />)}
+        {getConfig().ENABLE_HEADER_LANG_SELECTOR && (<LanguageSelector />)}
         {showUserDropdown && authenticatedUser && (
         <>
           <LearningHelpSlot />
