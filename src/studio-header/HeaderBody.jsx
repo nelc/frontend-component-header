@@ -13,6 +13,7 @@ import CourseLockUp from './CourseLockUp';
 import UserMenu from './UserMenu';
 import BrandNav from './BrandNav';
 import NavDropdownMenu from './NavDropdownMenu';
+import LanguageSelector from '../language-selector';
 
 const HeaderBody = ({
   logo,
@@ -97,6 +98,7 @@ const HeaderBody = ({
         )}
         <ActionRow.Spacer />
         <Nav>
+          <LanguageSelector />
           <UserMenu
             {...{
               username,
