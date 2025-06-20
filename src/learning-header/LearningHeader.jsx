@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { getConfig } from '@edx/frontend-platform';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { AppContext } from '@edx/frontend-platform/react';
-import { ProfileDataModal } from '@edunext/frontend-essentials';
+import { ProfileDataModal, LisanAI } from '@edunext/frontend-essentials';
 
 import AnonymousUserMenu from './AnonymousUserMenu';
 import AuthenticatedUserDropdown from './AuthenticatedUserDropdown';
@@ -34,6 +34,7 @@ const LearningHeader = ({
         <div className="flex-grow-1 course-title-lockup d-flex" style={{ lineHeight: 1 }}>
           <CourseInfoSlot courseOrg={courseOrg} courseNumber={courseNumber} courseTitle={courseTitle} />
         </div>
+        {getConfig().LISAN_AI_ENABLED && (<LisanAI />)}
         {showUserDropdown && authenticatedUser && (
         <>
           <LearningHelpSlot />
