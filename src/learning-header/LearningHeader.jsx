@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { getConfig } from '@edx/frontend-platform';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { AppContext } from '@edx/frontend-platform/react';
-import { ProfileDataModal } from '@edunext/frontend-essentials';
+import { ProfileDataModal, LisanAI } from '@edunext/frontend-essentials';
 
 import AnonymousUserMenu from './AnonymousUserMenu';
 import AuthenticatedUserDropdown from './AuthenticatedUserDropdown';
@@ -51,6 +51,7 @@ const LearningHeader = ({
           <span className="d-block m-0 font-weight-bold course-title">{courseTitle}</span>
         </div>
         <LanguageSelector />
+        {getConfig().LISAN_AI_ENABLED && (<LisanAI />)}
         {showUserDropdown && authenticatedUser && (
           <>
             <AuthenticatedUserDropdown
