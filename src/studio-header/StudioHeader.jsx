@@ -38,7 +38,7 @@ const StudioHeader = ({
 
   return (
     <div className="studio-header">
-      {getConfig().LISAN_AI_ENABLED && (<LisanAI />)}
+      {getConfig().LISAN_AI_ENABLED && (<LisanAI clientId={getConfig().LISAN_AI_CLIENT_ID} />)}
       <a className="nav-skip sr-only sr-only-focusable" href="#main">Skip to content</a>
       <Responsive maxWidth={841}>
         <MobileHeader {...props} />
