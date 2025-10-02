@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { getConfig } from '@edx/frontend-platform';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { AppContext } from '@edx/frontend-platform/react';
+import { ProfileDataModal } from '@edunext/frontend-essentials';
 
 import AnonymousUserMenu from './AnonymousUserMenu';
 import AuthenticatedUserDropdown from './AuthenticatedUserDropdown';
@@ -39,6 +40,7 @@ const LearningHeader = ({
           <AuthenticatedUserDropdown
             username={authenticatedUser.username}
           />
+          <ProfileDataModal />
         </>
         )}
         {showUserDropdown && !authenticatedUser && (
