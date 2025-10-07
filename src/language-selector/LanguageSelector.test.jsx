@@ -29,8 +29,6 @@ jest.mock('@openedx/paragon', () => ({
 const LANGUAGE_PREFERENCE_COOKIE_NAME = 'language-preference';
 
 describe('LanguageSelector', () => {
-  let mockReload;
-
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -41,13 +39,6 @@ describe('LanguageSelector', () => {
     });
 
     initializeMockApp();
-
-    mockReload = jest.fn();
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      writable: true,
-      value: { reload: mockReload },
-    });
 
     global.innerWidth = 1200;
   });
