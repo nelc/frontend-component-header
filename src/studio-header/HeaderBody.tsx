@@ -1,4 +1,5 @@
 import React, { type ReactNode, type ComponentProps } from 'react';
+import { getConfig } from '@edx/frontend-platform';
 import classNames from 'classnames';
 import {
   ActionRow,
@@ -13,6 +14,7 @@ import CourseLockUp from './CourseLockUp';
 import UserMenu from './UserMenu';
 import BrandNav from './BrandNav';
 import NavDropdownMenu from './NavDropdownMenu';
+import LanguageSelector from '../language-selector';
 import StudioHeaderActionsSlot from '../plugin-slots/StudioHeaderActionsSlot';
 
 export interface HeaderBodyProps {
@@ -136,6 +138,7 @@ const HeaderBody = ({
           </>
         )}
         <ActionRow.Spacer />
+        {getConfig().ENABLE_HEADER_LANG_SELECTOR && (<LanguageSelector />)}
         <StudioHeaderActionsSlot
           searchButtonAction={searchButtonAction}
         />
