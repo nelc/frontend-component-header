@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { getConfig } from '@edx/frontend-platform';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import { AppContext } from '@edx/frontend-platform/react';
-import { ProfileDataModal } from '@edunext/frontend-essentials';
+import { ProfileDataModal, LisanAI } from '@edunext/frontend-essentials';
 
 import AnonymousUserMenu from './AnonymousUserMenu';
 import AuthenticatedUserDropdown from './AuthenticatedUserDropdown';
@@ -40,6 +40,7 @@ const LearningHeader = ({
           <CourseInfoSlot courseOrg={courseOrg} courseNumber={courseNumber} courseTitle={courseTitle} />
         </div>
         {getConfig().ENABLE_HEADER_LANG_SELECTOR && (<LanguageSelector />)}
+        {getConfig().LISAN_AI_ENABLED && (<LisanAI />)}
         {showUserDropdown && authenticatedUser && (
         <>
           <LearningHeaderActionsSlot />
