@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { getConfig } from '@edx/frontend-platform';
+import { ProfileDataModal } from '@edunext/frontend-essentials';
 
 // Local Components
 import DesktopUserMenuToggleSlot
@@ -15,6 +16,7 @@ import { desktopHeaderMainOrSecondaryMenuDataShape } from './DesktopHeaderMainOr
 import DesktopSecondaryMenuSlot from '../plugin-slots/DesktopSecondaryMenuSlot';
 import DesktopUserMenuSlot from '../plugin-slots/DesktopUserMenuSlot';
 import { desktopUserMenuDataShape } from './DesktopHeaderUserMenu';
+import LanguageSelector from '../language-selector';
 
 // i18n
 import messages from '../Header.messages';
@@ -92,11 +94,13 @@ class DesktopHeader extends React.Component {
               aria-label={intl.formatMessage(messages['header.label.secondary.nav'])}
               className="nav secondary-menu-container align-items-center ml-auto"
             >
+              {getConfig().ENABLE_HEADER_LANG_SELECTOR && (<LanguageSelector />)}
               {loggedIn
                 ? (
                   <>
                     {this.renderSecondaryMenu()}
                     {this.renderUserMenu()}
+                    <ProfileDataModal />
                   </>
                 ) : this.renderLoggedOutItems()}
             </nav>
