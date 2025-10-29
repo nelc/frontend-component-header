@@ -1,6 +1,6 @@
 {
   "name": "@edunext/frontend-component-header",
-  "version": "6.6.1-nelp.1",
+  "version": "6.6.1-nelp.2",
   "description": "The standard header for Open edX",
   "main": "dist/index.js",
   "publishConfig": {
