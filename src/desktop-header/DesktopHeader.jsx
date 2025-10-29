@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from '@edx/frontend-platform/i18n';
 import { getConfig } from '@edx/frontend-platform';
+import { ProfileDataModal } from '@edunext/frontend-essentials';
 
 // Local Components
 import DesktopUserMenuToggleSlot
@@ -80,6 +81,7 @@ const DesktopHeader = ({
                 <>
                   {renderSecondaryMenu()}
                   {renderUserMenu()}
+                  <ProfileDataModal />
                 </>
               ) : renderLoggedOutItems()}
           </nav>
