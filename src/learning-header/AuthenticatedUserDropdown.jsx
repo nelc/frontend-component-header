@@ -36,7 +36,7 @@ const AuthenticatedUserDropdown = ({ intl, username }) => {
   ];
 
   return (
-    <Dropdown className="user-dropdown ml-3">
+    <Dropdown className="user-dropdown">
       <Dropdown.Toggle variant="outline-primary" aria-label={intl.formatMessage(messages.userOptionsDropdownLabel)}>
         <LearningUserMenuToggleSlot label={username} icon={faUserCircle} />
       </Dropdown.Toggle>

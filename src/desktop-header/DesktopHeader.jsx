@@ -92,7 +92,7 @@ class DesktopHeader extends React.Component {
             </nav>
             <nav
               aria-label={intl.formatMessage(messages['header.label.secondary.nav'])}
-              className="nav secondary-menu-container align-items-center ml-auto"
+              className="nav secondary-menu-container align-items-center"
             >
               {getConfig().ENABLE_HEADER_LANG_SELECTOR && (<LanguageSelector />)}
               {loggedIn

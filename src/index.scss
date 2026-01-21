@@ -45,9 +45,13 @@ $rounded-pill: 50rem  !default;
     }
   }
 
-  .user-dropdown .btn {
-    height: 3rem;
+  .user-dropdown{
+    margin-left: var(--pgn-spacing-spacer-base);
+    .btn {
+      height: 3rem;
+    }
   }
+
 }
 
 .site-header-mobile,
@@ -93,6 +97,8 @@ $rounded-pill: 50rem  !default;
     }
   }
   .secondary-menu-container {
+    margin-left: auto;
+
     .nav-link:hover,
     .nav-link:focus,
     .nav-link.active,
