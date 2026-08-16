@@ -1,12 +1,15 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { IntlProvider } from '@edx/frontend-platform/i18n';
+import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 import TestRenderer from 'react-test-renderer';
 import { AppContext } from '@edx/frontend-platform/react';
 import { Context as ResponsiveContext } from 'react-responsive';
 import { MemoryRouter } from 'react-router-dom';
 
 import Header from './index';
+
+jest.mock('@edx/frontend-platform/auth');
 
 const HeaderComponent = ({ width, contextValue }) => (
   <ResponsiveContext.Provider value={width}>
@@ -23,6 +26,12 @@ const HeaderComponent = ({ width, contextValue }) => (
 );
 
 describe('<Header />', () => {
+  afterEach(() => {
+    TestRenderer.act(() => {
+      TestRenderer.create(null); // desmount any previos tree
+    });
+  });
+
   it('renders correctly for anonymous desktop', () => {
     const contextValue = {
       authenticatedUser: null,
@@ -43,6 +52,8 @@ describe('<Header />', () => {
   });
 
   it('renders correctly for authenticated desktop', () => {
+    const get = jest.fn(() => Promise.reject(new Error('not found')));
+    getAuthenticatedHttpClient.mockReturnValue({ get });
     const contextValue = {
       authenticatedUser: {
         userId: 'abc123',
