@@ -1,7 +1,8 @@
 import React, { type FunctionComponent, useContext } from 'react';
 import Responsive from 'react-responsive';
 import { AppContext } from '@edx/frontend-platform/react';
-import { ensureConfig } from '@edx/frontend-platform';
+import { ensureConfig, getConfig } from '@edx/frontend-platform';
+import { LisanAI } from '@edunext/frontend-essentials';
 
 import MobileHeader from './MobileHeader';
 import HeaderBody, { HeaderBodyProps } from './HeaderBody';
@@ -63,6 +64,7 @@ const StudioHeader: FunctionComponent<Props> = ({
 
   return (
     <div className="studio-header">
+      {getConfig().LISAN_AI_ENABLED && (<LisanAI />)}
       <a className="nav-skip sr-only sr-only-focusable" href="#main">Skip to content</a>
       <Responsive maxWidth={841}>
         <MobileHeader {...props} />
