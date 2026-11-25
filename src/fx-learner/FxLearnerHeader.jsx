@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getConfig } from '@edx/frontend-platform';
 import { changeUserSessionLanguage, useIntl } from '@edx/frontend-platform/i18n';
@@ -85,8 +85,15 @@ const skipToMain = (event) => {
   if (typeof target.scrollIntoView === 'function') { target.scrollIntoView(); }
 };
 
+/** Marks the page as running the learner theme, for the few page-level rules in FxLearner.scss. */
+const PAGE_CLASS = 'fx-learner-theme';
+
 const FxLearnerHeaderInner = ({ showUserDropdown = true, learning = false }) => {
   const intl = useIntl();
+  useEffect(() => {
+    document.documentElement.classList.add(PAGE_CLASS);
+    return () => document.documentElement.classList.remove(PAGE_CLASS);
+  }, []);
   const { authenticatedUser } = useContext(AppContext) || {};
   const { status, shell } = useFxShell();
   const signedIn = !!authenticatedUser;

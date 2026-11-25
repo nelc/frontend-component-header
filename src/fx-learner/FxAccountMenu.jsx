@@ -4,7 +4,7 @@ import { useIntl } from '@edx/frontend-platform/i18n';
 
 import FxIcon from './Icons';
 import messages from './messages';
-import { clampPercent, initialOf } from './utils';
+import { clampPercent, initialOf, resolveUrl } from './utils';
 
 const hasCount = (n) => Number.isFinite(Number(n)) && n !== null && n !== '';
 
@@ -42,6 +42,8 @@ const FxAccountMenu = ({
   const fallbackName = intl.formatMessage(messages.accountFallbackName);
   const initial = initialOf(firstName);
   const resumePercent = resume ? clampPercent(resume.progress_percent) : 0;
+  // Like every other URL from the API: relative paths belong to the LMS, not to the MFE's own origin.
+  const resumeHref = resume ? resolveUrl(resume.resume_url) : null;
 
   const items = [
     {
@@ -89,8 +91,8 @@ const FxAccountMenu = ({
             </div>
           </div>
 
-          {resume && resume.resume_url && (
-            <a className="fx-acct__resume" href={resume.resume_url}>
+          {resumeHref && (
+            <a className="fx-acct__resume" href={resumeHref}>
               <small>{intl.formatMessage(messages.menuResume)}</small>
               <b>{resume.title}</b>
               <span

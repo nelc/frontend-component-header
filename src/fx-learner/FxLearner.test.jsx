@@ -281,6 +281,19 @@ describe('FxLearnerHeader, skip link', () => {
 });
 
 describe('learner shell brand colour', () => {
+  it('marks the page while the learner shell is mounted, and only then', async () => {
+    expect(document.documentElement).not.toHaveClass('fx-learner-theme');
+    const { unmount } = renderWith(<Header />);
+    await screen.findByText('Abaad');
+    expect(document.documentElement).toHaveClass('fx-learner-theme');
+    unmount();
+    expect(document.documentElement).not.toHaveClass('fx-learner-theme');
+
+    mergeConfig({ FX_LEARNER_THEME: false });
+    renderWith(<Header />);
+    expect(document.documentElement).not.toHaveClass('fx-learner-theme');
+  });
+
   it('keeps the default green when the shell has no brand_color', async () => {
     const { container } = renderWith(<><Header /><FxLearnerFooter /></>);
     await screen.findByText('Abaad');
@@ -412,6 +425,29 @@ describe('FxLearnerHeader, signed in', () => {
     const out = screen.getByRole('link', { name: 'Sign out' });
     expect(out).toHaveAttribute('href', `${LMS}/logout`);
     expect(out).toHaveClass('fx-acct__item--out');
+  });
+
+  it.each([
+    ['/learning/course/course-v1:a+b+c/home', `${LMS}/learning/course/course-v1:a+b+c/home`],
+    ['https://demo.example.com/learning/course/course-v1:a+b+c/home', 'https://demo.example.com/learning/course/course-v1:a+b+c/home'],
+  ])('points the resume card at the learning MFE course home (%s)', async (resumeUrl, expected) => {
+    programsGet.mockResolvedValue({ data: { ...PROGRAMS, resume: { ...PROGRAMS.resume, resume_url: resumeUrl } } });
+    renderWith(<Header />, { user: USER });
+    await screen.findByText('Abaad');
+    await waitFor(() => expect(programsGet).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: 'Account menu' }));
+    expect(screen.getByRole('link', { name: /Continue where you left off/ })).toHaveAttribute('href', expected);
+  });
+
+  it('leaves the resume card out when its URL is not a safe link', async () => {
+    // eslint-disable-next-line no-script-url
+    programsGet.mockResolvedValue({ data: { ...PROGRAMS, resume: { ...PROGRAMS.resume, resume_url: 'javascript:alert(1)' } } });
+    const { container } = renderWith(<Header />, { user: USER });
+    await screen.findByText('Abaad');
+    await waitFor(() => expect(programsGet).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: 'Account menu' }));
+    expect(container.querySelector('.fx-acct__menu')).toBeInTheDocument();
+    expect(container.querySelector('.fx-acct__resume')).toBeNull();
   });
 
   it('closes the menu on Escape', async () => {
