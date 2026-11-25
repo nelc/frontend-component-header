@@ -11,7 +11,7 @@ import FxIcon from './Icons';
 import { useFxShell } from './hooks';
 import messages from './messages';
 import {
-  localize, primaryLang, resolveUrl, socialHref, socialKey,
+  brandStyle, localize, primaryLang, resolveUrl, socialHref, socialKey,
 } from './utils';
 
 const SOCIAL_ICONS = {
@@ -66,7 +66,13 @@ const FxLearnerFooterInner = () => {
   const newTabHint = intl.formatMessage(messages.footerNewTab);
 
   return (
-    <footer className="fx-shell fx-footer" dir={dir} lang={lang} aria-label={intl.formatMessage(messages.footerLabel)}>
+    <footer
+      className="fx-shell fx-footer"
+      dir={dir}
+      lang={lang}
+      aria-label={intl.formatMessage(messages.footerLabel)}
+      style={brandStyle(shell && shell.brand_color)}
+    >
       <div className="fx-wrap fx-foot">
         <small className="fx-foot__rights">{copyright}</small>
         {(links.length > 0 || (siteHref && siteLabel)) && (

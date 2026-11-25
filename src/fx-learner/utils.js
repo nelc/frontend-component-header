@@ -28,6 +28,50 @@ export const resolveUrl = (url) => {
   }
 };
 
+/** Add `?next=<current page>` to a sign-in URL so the learner returns to where they were (as the stock headers do). */
+export const withReturnTo = (url) => {
+  if (typeof url !== 'string' || !/^https?:/i.test(url)) { return url; }
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set('next', window.location.href);
+    return parsed.href;
+  } catch (e) {
+    return url;
+  }
+};
+
+const HEX_COLOR = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+/**
+ * Inline custom properties that put the tenant's primary colour (shell `brand_color`) on a `.fx-shell` root.
+ * Shades are derived the same way the LMS learner theme derives them. Anything that is not a plain hex colour
+ * is ignored, which leaves the stylesheet's default green in place.
+ *
+ * @returns {object|undefined}
+ */
+export const brandStyle = (color) => {
+  const value = typeof color === 'string' ? color.trim() : '';
+  if (!HEX_COLOR.test(value)) { return undefined; }
+  return {
+    '--fx-brand': value,
+    '--fx-brand-hover': `color-mix(in srgb, ${value} 82%, #000)`,
+    '--fx-brand-soft': `color-mix(in srgb, ${value} 6%, #fff)`,
+    '--fx-brand-line': `color-mix(in srgb, ${value} 45%, #fff)`,
+  };
+};
+
+/**
+ * The page's main region, looked up when the skip link is used: each MFE names it differently
+ * (`#main-content` in the learning MFE and most others, `#main` in the learner hub).
+ *
+ * @returns {HTMLElement|null}
+ */
+export const findMainLandmark = () => (
+  document.getElementById('main-content')
+  || document.getElementById('main')
+  || document.querySelector('main, [role="main"]')
+);
+
 const trimSlash = (path) => (path.length > 1 ? path.replace(/\/+$/, '') : path);
 
 /** Is `url` the page the user is on (the site root: exact match; others: the page or anything below it)? */

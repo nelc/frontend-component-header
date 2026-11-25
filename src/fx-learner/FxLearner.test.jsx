@@ -12,13 +12,16 @@ import {
 import Header, { LearningHeader, FxLearnerFooter, isFxLearnerTheme } from '../index';
 import { resetFxLearnerCache } from './api';
 import {
-  maskEmail, resolveUrl, socialHref,
+  brandStyle, maskEmail, resolveUrl, socialHref,
 } from './utils';
 
 jest.mock('@edx/frontend-platform/auth');
 jest.mock('@edunext/frontend-essentials', () => ({
   ProfileDataModal: () => null,
-  LisanAI: () => null,
+  LisanAI: () => <span data-testid="lisan-ai" />,
+}));
+jest.mock('@openedx/frontend-plugin-framework', () => ({
+  PluginSlot: ({ id, children }) => <span data-testid={`slot-${id}`}>{children}</span>,
 }));
 jest.mock('@edx/frontend-platform/i18n', () => ({
   ...jest.requireActual('@edx/frontend-platform/i18n'),
@@ -86,6 +89,9 @@ const renderWith = (ui, { locale = 'en', user = null } = {}) => render(
     </IntlProvider>
   </ResponsiveContext.Provider>,
 );
+
+const loginWithNext = () => `${LMS}/login?next=${encodeURIComponent(window.location.href)}`;
+const HELP_SLOT = 'slot-org.openedx.frontend.layout.header_learning_help.v1';
 
 let shellGet;
 let programsGet;
@@ -160,7 +166,7 @@ describe('FxLearnerHeader, signed out', () => {
     const links = screen.getAllByRole('link').filter((a) => a.classList.contains('fx-nav__link'));
     expect(links.map((a) => a.textContent)).toEqual(['Home', 'Programs', 'About']);
     expect(links[1]).toHaveAttribute('href', `${LMS}/courses`);
-    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', `${LMS}/login`);
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', loginWithNext());
     expect(container.querySelector('.fx-acct')).toBeNull();
     expect(shellGet).toHaveBeenCalledWith(`${LMS}/api/fx/theme/v1/shell/`);
     expect(programsGet).not.toHaveBeenCalled();
@@ -212,7 +218,18 @@ describe('FxLearnerHeader, signed out', () => {
     expect(container.querySelector('.fx-logo__mark img')).toHaveAttribute('src', getConfig().LOGO_URL);
     expect(screen.getByText('Platform Default')).toBeInTheDocument();
     expect(container.querySelector('.fx-nav')).toBeNull();
-    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', `${LMS}/login`);
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', loginWithNext());
+  });
+
+  it('sends the visitor back to the page they were on after signing in', async () => {
+    window.history.pushState({}, '', '/learning/course/course-v1:a+b+c/block-v1:x?tab=1');
+    renderWith(<LearningHeader />);
+    await screen.findByText('Abaad');
+    const href = screen.getByRole('link', { name: 'Sign in' }).getAttribute('href');
+    const parsed = new URL(href);
+    expect(`${parsed.origin}${parsed.pathname}`).toBe(`${LMS}/login`);
+    expect(parsed.searchParams.get('next')).toBe(window.location.href);
+    expect(window.location.href).toContain('/learning/course/course-v1:a+b+c/block-v1:x?tab=1');
   });
 
   it('caches the shell between renders', async () => {
@@ -222,6 +239,112 @@ describe('FxLearnerHeader, signed out', () => {
     renderWith(<Header />);
     expect(screen.getByText('Abaad')).toBeInTheDocument(); // synchronous: served from cache
     expect(shellGet).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('FxLearnerHeader, skip link', () => {
+  const addMain = (attrs) => {
+    const main = document.createElement('main');
+    Object.entries(attrs).forEach(([key, value]) => main.setAttribute(key, value));
+    document.body.appendChild(main);
+    return main;
+  };
+
+  afterEach(() => {
+    document.querySelectorAll('main').forEach((node) => node.remove());
+  });
+
+  it.each([
+    ['#main-content (learning MFE and most others)', { id: 'main-content' }],
+    ['#main (learner hub)', { id: 'main' }],
+    ['a main landmark with no id', {}],
+  ])('moves focus to %s', async (_label, attrs) => {
+    const main = addMain(attrs);
+    renderWith(<LearningHeader />);
+    await screen.findByText('Abaad');
+    const skip = screen.getByRole('link', { name: 'Skip to main content' });
+    expect(fireEvent.click(skip)).toBe(false); // handled: default navigation prevented
+    expect(document.activeElement).toBe(main);
+    expect(main).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('keeps an existing tabindex and falls back to the plain anchor when there is no main region', async () => {
+    renderWith(<Header />);
+    await screen.findByText('Abaad');
+    const skip = screen.getByRole('link', { name: 'Skip to main content' });
+    expect(fireEvent.click(skip)).toBe(true);
+    const main = addMain({ id: 'main-content', tabindex: '0' });
+    fireEvent.click(skip);
+    expect(document.activeElement).toBe(main);
+    expect(main).toHaveAttribute('tabindex', '0');
+  });
+});
+
+describe('learner shell brand colour', () => {
+  it('keeps the default green when the shell has no brand_color', async () => {
+    const { container } = renderWith(<><Header /><FxLearnerFooter /></>);
+    await screen.findByText('Abaad');
+    expect(container.querySelector('.fx-header')).not.toHaveAttribute('style');
+    expect(container.querySelector('.fx-footer')).not.toHaveAttribute('style');
+  });
+
+  it('applies the tenant colour and derived shades to header and footer', async () => {
+    shellGet.mockResolvedValue({ data: { ...SHELL, brand_color: '#7a1f5c' } });
+    const { container } = renderWith(<><Header /><FxLearnerFooter /></>);
+    await screen.findByText('Abaad');
+    await waitFor(() => expect(container.querySelector('.fx-footer')).toBeInTheDocument());
+    ['.fx-header', '.fx-footer'].forEach((selector) => {
+      const { style } = container.querySelector(selector);
+      expect(style.getPropertyValue('--fx-brand')).toBe('#7a1f5c');
+      expect(style.getPropertyValue('--fx-brand-hover')).toBe('color-mix(in srgb, #7a1f5c 82%, #000)');
+      expect(style.getPropertyValue('--fx-brand-soft')).toBe('color-mix(in srgb, #7a1f5c 6%, #fff)');
+      expect(style.getPropertyValue('--fx-brand-line')).toBe('color-mix(in srgb, #7a1f5c 45%, #fff)');
+    });
+  });
+
+  it.each([
+    [null], [''], ['red'], ['#12345'], ['#7a1f5c; background: url(x)'], ['rgb(1,2,3)'], [42],
+  ])('ignores %p', (value) => {
+    expect(brandStyle(value)).toBeUndefined();
+  });
+
+  it('accepts short and long hex', () => {
+    expect(brandStyle('#abc')['--fx-brand']).toBe('#abc');
+    expect(brandStyle(' #1B8354 ')['--fx-brand']).toBe('#1B8354');
+  });
+});
+
+describe('FxLearnerHeader standing in for the learning header', () => {
+  it('keeps the Lisan AI assistant when it is enabled, and only then', async () => {
+    const off = renderWith(<LearningHeader />);
+    await screen.findByText('Abaad');
+    expect(screen.queryByTestId('lisan-ai')).toBeNull();
+    off.unmount();
+    mergeConfig({ LISAN_AI_ENABLED: true });
+    try {
+      const on = renderWith(<LearningHeader />);
+      expect(screen.getByTestId('lisan-ai')).toBeInTheDocument();
+      on.unmount();
+      renderWith(<Header />); // the default header never had the assistant
+      expect(screen.queryByTestId('lisan-ai')).toBeNull();
+    } finally {
+      mergeConfig({ LISAN_AI_ENABLED: false });
+    }
+  });
+
+  it('keeps the help plugin slot for signed-in learners, as the stock learning header does', async () => {
+    const signedIn = renderWith(<LearningHeader />, { user: USER });
+    await screen.findByText('Abaad');
+    expect(screen.getByTestId(HELP_SLOT)).toBeInTheDocument();
+    signedIn.unmount();
+    const noMenu = renderWith(<LearningHeader showUserDropdown={false} />, { user: USER });
+    expect(screen.queryByTestId(HELP_SLOT)).toBeNull();
+    noMenu.unmount();
+    const anonymous = renderWith(<LearningHeader />);
+    expect(screen.queryByTestId(HELP_SLOT)).toBeNull();
+    anonymous.unmount();
+    renderWith(<Header />, { user: USER });
+    expect(screen.queryByTestId(HELP_SLOT)).toBeNull();
   });
 });
 
