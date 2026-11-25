@@ -15,9 +15,10 @@ const SwitchableHeader = (props) => (
 );
 
 // The learner shell has no course lock-up, so only `showUserDropdown` carries over; course props are ignored.
+// `learning` keeps the Lisan AI assistant and the help plugin slot the stock LearningHeader renders.
 const SwitchableLearningHeader = ({ showUserDropdown = true, ...rest }) => (
   isFxLearnerTheme()
-    ? <FxLearnerHeader showUserDropdown={showUserDropdown} />
+    ? <FxLearnerHeader showUserDropdown={showUserDropdown} learning />
     : <LearningHeader showUserDropdown={showUserDropdown} {...rest} />
 );
 

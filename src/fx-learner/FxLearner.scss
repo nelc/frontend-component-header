@@ -199,6 +199,25 @@
     &:hover { background: var(--fx-sunk); }
   }
 
+  // Help plugin slot kept from the stock learning header (its default content is a plain link).
+  .fx-help {
+    display: inline-flex;
+    align-items: center;
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 12px;
+      border-radius: var(--fx-radius-sm);
+      color: var(--fx-text);
+      font-size: 15px;
+      font-weight: 500;
+
+      &:hover { background: var(--fx-sunk); color: var(--fx-text); }
+    }
+  }
+
   .fx-btn {
     display: inline-flex;
     align-items: center;
