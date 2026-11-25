@@ -2,6 +2,15 @@
 // and driven by `--fx-*` custom properties so nothing leaks into (or is overridden by) Paragon's `--pgn-*`.
 // Tokens come from the approved learner-experience prototype. Logical properties keep ar (RTL) and en (LTR) in sync.
 
+// Page-level, learner-theme tenants only (the header puts this class on <html>). The platform derives the
+// Paragon link colour as the tenant's primary colour lightened by 35 %, which turns the design green into a
+// pale green that fails contrast on white. Links in the host MFE use the primary colour itself instead.
+// `!important` is needed because the platform sets its values inline on <html>.
+html.fx-learner-theme {
+  --pgn-color-link-base: var(--pgn-color-primary-500) !important;
+  --pgn-color-link-hover: var(--pgn-color-primary-700) !important;
+}
+
 .fx-shell {
   --fx-brand: #1b8354;
   --fx-brand-hover: #166a45;
